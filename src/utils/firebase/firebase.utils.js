@@ -1,10 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import {
-    getAuth,
-    signInWithPopup,
-    signInWithRedirect,
-    GoogleAuthProvider,
-} from 'firebase/auth';
+import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword } from 'firebase/auth';
 
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 
@@ -19,14 +14,17 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
+// eslint-disable-next-line no-unused-vars
 const firebaseApp = initializeApp(firebaseConfig);
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({ prompt: 'select_account' });
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 export const auth = getAuth();
-export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+export const signInWithGooglePopup = () => signInWithPopup(auth, googleProvider);
 export const db = getFirestore();
+
 export const createUserDocumentFromAuth = async (userAuth) => {
+    if (!userAuth) return;
     const userDocRef = doc(db, 'users', userAuth.uid);
     console.log(userDocRef); //
     const userSanpshot = await getDoc(userDocRef);
@@ -42,5 +40,21 @@ export const createUserDocumentFromAuth = async (userAuth) => {
         } catch (error) {
             console.log('error: ' + error);
         }
+    }
+};
+
+export const createAuthUserWithEmailAndPassword = async ({ displayName, email, password }) => {
+    if (!email || !password) return;
+    try {
+        const userAuth = await createUserWithEmailAndPassword(auth, email, password);
+        const { uid } = userAuth.user;
+        const userDocRef = doc(db, 'users', uid);
+        const userSanpshot = await getDoc(userDocRef);
+        if (!userSanpshot.exists()) {
+            const createdAt = new Date();
+            await setDoc(userDocRef, { displayName: displayName, email: email, createdAt });
+        }
+    } catch (error) {
+        console.log(error);
     }
 };
