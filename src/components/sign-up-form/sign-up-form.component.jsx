@@ -27,7 +27,7 @@ const SignUpFrom = () => {
             return;
         }
         try {
-            const { user } = await createAuthUserWithEmailAndPassword({ displayName, email, password });
+            const { user } = await createAuthUserWithEmailAndPassword({ email, password });
             createUserDocumentFromAuth(user, { displayName });
             resetFormField();
         } catch (error) {
@@ -67,7 +67,7 @@ const SignUpFrom = () => {
                     value={confirmPassword}
                 />
                 <Button buttonType="regular" type="submit">
-                    Sign in
+                    Sign up
                 </Button>
             </form>
         </div>
