@@ -1,27 +1,14 @@
-import { useContext, useState } from 'react';
-import { UserContext } from '../../contexts/user.context';
-import {
-    createUserDocumentFromAuth,
-    signInUserWithEmailAndPassword,
-    signInWithGooglePopup,
-} from '../../utils/firebase/firebase.utils';
+import { useState } from 'react';
+import { signInUserWithEmailAndPassword, signInWithGooglePopup } from '../../utils/firebase/firebase.utils';
 import Button from '../button/button.component';
 import FormInput from '../form-input/form-input.component';
 import './sing-in-form.styles.scss';
 
 const SingInForm = () => {
-    const { setCurrentUser } = useContext(UserContext);
-
-    const signInWithGoogle = async () => {
-        const { user } = await signInWithGooglePopup();
-        createUserDocumentFromAuth(user);
-    };
-
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const { user } = await signInUserWithEmailAndPassword(formFields);
-            setCurrentUser(user);
+            await signInUserWithEmailAndPassword(formFields);
         } catch (error) {
             switch (error.code) {
                 case 'auth/wrong-password':
@@ -65,7 +52,7 @@ const SingInForm = () => {
                         Sign in
                     </Button>
 
-                    <Button type="button" onClick={signInWithGoogle} buttonType="google">
+                    <Button type="button" onClick={signInWithGooglePopup} buttonType="google">
                         Google Sign in
                     </Button>
                 </div>
