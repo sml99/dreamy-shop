@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { UserContext } from '../../contexts/user.context';
 import {
     createUserDocumentFromAuth,
     signInUserWithEmailAndPassword,
@@ -9,6 +10,8 @@ import FormInput from '../form-input/form-input.component';
 import './sing-in-form.styles.scss';
 
 const SingInForm = () => {
+    const { setCurrentUser } = useContext(UserContext);
+
     const signInWithGoogle = async () => {
         const { user } = await signInWithGooglePopup();
         createUserDocumentFromAuth(user);
@@ -17,8 +20,8 @@ const SingInForm = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await signInUserWithEmailAndPassword(formFields);
-            console.log(response);
+            const { user } = await signInUserWithEmailAndPassword(formFields);
+            setCurrentUser(user);
         } catch (error) {
             switch (error.code) {
                 case 'auth/wrong-password':
