@@ -1,5 +1,34 @@
 import { createContext, useEffect, useState } from 'react';
 
+const addCartItem = (cartItems, productToAdd) => {
+    const existingCartItem = cartItems.find((cartItem) => cartItem.id === productToAdd.id);
+    if (existingCartItem) {
+        return cartItems.map((cartItem) =>
+            cartItem.id === productToAdd.id ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem
+        );
+    }
+
+    return [...cartItems, { ...productToAdd, quantity: 1 }];
+};
+
+const removeItem = (cartItems, cartItemToRemove) => {
+    const itemId = cartItems.findIndex((item) => item.id === cartItemToRemove.id);
+    if (cartItems?.length === 1 && cartItems[0].id === cartItemToRemove.id) return [];
+    if (itemId !== -1) {
+        return [...cartItems].splice(itemId - 1, 1);
+    }
+};
+
+// const removeCartItem = (cartItems, cartItemToRemove) => {};
+
+const addQuantityAmount = (cartItems, product, amount = 1) => {
+    return cartItems.map((item) =>
+        item.id === product.id
+            ? { ...product, quantity: product.quantity + amount > 0 ? product.quantity + amount : 1 }
+            : item
+    );
+};
+
 const DATA = [
     {
         id: 3,
@@ -17,32 +46,8 @@ export const CartContext = createContext({
     cartItems: [],
     addItemToCart: () => {},
     cartCount: 0,
+    removeItemFromCart: () => {},
 });
-
-const addCartItem = (cartItems, productToAdd) => {
-    const itemId = cartItems.findIndex((item) => item.id === productToAdd.id);
-    if (itemId === -1) {
-        return [...cartItems, { ...productToAdd, quantity: 1 }];
-    } else cartItems[itemId].quantity += 1;
-
-    return [...cartItems];
-};
-
-const removeItem = (cartItems, productToRemove) => {
-    const itemId = cartItems.findIndex((item) => item.id === productToRemove.id);
-    if (cartItems?.length === 1 && cartItems[0].id === productToRemove.id) return [];
-    if (itemId !== -1) {
-        return [...cartItems].splice(itemId - 1, 1);
-    }
-};
-
-const addQuantityAmount = (cartItems, product, amount = 1) => {
-    return cartItems.map((item) =>
-        item.id === product.id
-            ? { ...product, quantity: product.quantity + amount > 0 ? product.quantity + amount : 1 }
-            : item
-    );
-};
 
 export const CartProvider = ({ children }) => {
     const [isCartOpen, setIsCartOpen] = useState(false);
